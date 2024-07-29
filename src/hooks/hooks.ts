@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type MutableRefObject } from "react";
 
 export function useOutClick(callbackfn: () => void) {
 
@@ -21,9 +21,9 @@ export function useOutClick(callbackfn: () => void) {
   return ref;
 }
 
-export function useKeyDown(keyId: string, callbackfn: (element: HTMLElement | null) => void) {
+export function useKeyDown(keyId: string, callbackfn: (element: HTMLButtonElement | null) => void): MutableRefObject<HTMLButtonElement | null> {
 
-  const ref = useRef(null)
+  const ref = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
