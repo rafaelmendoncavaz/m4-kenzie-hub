@@ -1,21 +1,29 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import { SignIn } from "./pages/sign-in/SignIn"
-import { SignUp } from "./pages/sign-up/SignUp"
+import { Bounce, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
+import { MainRoutes } from "./routes/MainRoutes";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <SignIn />
-  },
-  {
-    path: "/sign-up",
-    element: <SignUp />
-  }
-])
+
 
 function App() {
 
-  return <RouterProvider router={router} />
+  return (
+    <>
+      <MainRoutes />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Bounce}
+      />
+    </>
+  )
 }
 
 export default App

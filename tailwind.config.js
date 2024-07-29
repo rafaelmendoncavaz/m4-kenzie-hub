@@ -18,6 +18,11 @@ export default {
         success: "#3fe864",
         negative: "#e83f5b",
         congobrown: "#59323f"
+      },
+      screens: {
+        "mobile": {
+          "max": "640px"
+        }
       }
     },
   },

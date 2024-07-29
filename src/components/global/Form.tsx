@@ -1,23 +1,17 @@
 import type { ReactNode } from "react"
-import { useForm } from "react-hook-form"
 import { Button } from "./Button"
 
 interface FormProps {
   buttonText: string,
+  onSubmitFn: () => void,
   children: ReactNode
 }
 
-export function Form({ buttonText, children }: FormProps) {
-
-  const { handleSubmit } = useForm()
-
-  function onSubmit(data) {
-    console.log(data)
-  }
+export function Form({ buttonText, onSubmitFn, children }: FormProps) {
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={onSubmitFn}
       className="flex flex-col items-center space-y-4">
       {children}
       <Button type="submit" >
