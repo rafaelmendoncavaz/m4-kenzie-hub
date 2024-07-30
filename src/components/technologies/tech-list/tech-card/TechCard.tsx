@@ -12,14 +12,7 @@ export function TechCard({ tech }: TechCardProps) {
   const { deleteTech, setTechToEdit } = useAPIStore((store) => store)
 
   async function deleteCurrentTech(techId: string) {
-
     await deleteTech(techId)
-    const { onFailure, onSuccess } = useAPIStore.getState()
-    if (onSuccess) {
-      console.log("success")
-    } else if (onFailure) {
-      console.log("failure")
-    }
   }
 
   function editCurrentTech() {

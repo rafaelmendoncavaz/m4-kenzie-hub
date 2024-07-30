@@ -1,6 +1,8 @@
-import { user } from "../../schema/schema"
+import { useAPIStore } from "../../context/context"
 
 export function Welcome() {
+
+  const { user } = useAPIStore((store) => store)
 
   return (
     <section className="border-b border-b-zinc-600">

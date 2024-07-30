@@ -3,7 +3,7 @@ import { Form } from "../../global/Form";
 import { ForwardedInput as Input } from "../../global/Input";
 import { InputContainer } from "../../global/InputContainer";
 import { Modal } from "../../global/Modal";
-import { toastError, toastSuccess, useAPIStore, useModal } from "../../../context/context";
+import { useAPIStore, useModal } from "../../../context/context";
 import type { Techs } from "../../../schema/schema";
 
 export function AddNewTech() {
@@ -17,11 +17,7 @@ export function AddNewTech() {
 
     const { onTechListSuccess } = useAPIStore.getState()
     if (onTechListSuccess) {
-      toastSuccess("Tecnologia adicionada com sucesso!")
       closeModal()
-    }
-    if (!onTechListSuccess) {
-      toastError("Ops! Algo deu errado, tente novamente!")
     }
   }
 

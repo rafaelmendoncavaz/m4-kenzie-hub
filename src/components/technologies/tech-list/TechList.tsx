@@ -9,7 +9,9 @@ export function TechList() {
   const { techList, getTechs, onTechListSuccess } = useAPIStore((store) => store)
 
   useEffect(() => {
-    getTechs()
+    if (onTechListSuccess) {
+      getTechs()
+    }
   }, [onTechListSuccess])
 
   const { openAddTechModal } = useModal((store) => store)

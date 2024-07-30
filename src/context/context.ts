@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { user, type APIStore, type createUser, type LoginData, type Modal, type TechData, type Techs, type ToastMessage } from "../schema/schema"
+import { type APIStore, type createUser, type LoginData, type Modal, type TechData, type Techs, type ToastMessage, type User } from "../schema/schema"
 import { app } from "../services/app"
 import { Bounce, toast } from "react-toastify"
 
@@ -51,7 +51,11 @@ export const useModal = create<Modal>((set) => ({
 export const useAPIStore = create<APIStore>((set) => ({
   onSuccess: false,
   onFailure: false,
-  onTechListSuccess: false,
+  onTechListSuccess: true,
+  user: null,
+  setUser: (userData: User | null) => {
+    set({ user: userData })
+  },
   createUser: async (data: createUser) => {
     try {
       set({ onSuccess: false, onFailure: false })
@@ -73,16 +77,19 @@ export const useAPIStore = create<APIStore>((set) => ({
       localStorage.setItem("@KHUB_USER", JSON.stringify(getUser.data.user))
       localStorage.setItem("@KHUB_TOKEN", getUser.data.token)
 
-      set({ onSuccess: true })
+      set({ onSuccess: true, user: getUser.data.user })
+      toastSuccess("Login efetuado com sucesso!")
 
     } catch (error) {
       set({ onFailure: true })
       console.error("Error logging in", error)
+      toastError("Falha ao fazer login. Verifique seu email e senha.")
     }
   },
   userLogout: (callback) => {
     localStorage.removeItem("@KHUB_USER")
     localStorage.removeItem("@KHUB_TOKEN")
+    set({ user: null })
     if (callback) callback()
     toastSuccess("Logout de KenzieHub efetuado com sucesso!")
   },
@@ -90,20 +97,22 @@ export const useAPIStore = create<APIStore>((set) => ({
   getTechs: async () => {
     try {
       set({ onSuccess: false, onFailure: false })
-      const id = user?.id
-      const { data } = await app.get(`/users/${id}`)
-      set({ onTechListSuccess: true, techList: data.techs })
+      const token = localStorage.getItem("@KHUB_TOKEN")
+      const { data } = await app.get("/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
+      set({ techList: data.techs })
 
     } catch (error) {
       set({ onFailure: true })
       console.error("Error getting techs", error)
-    } finally {
-      set({ onTechListSuccess: false })
     }
   },
   addNewTech: async (data: Techs) => {
     try {
-      set({ onSuccess: false, onFailure: false })
+      set({ onTechListSuccess: false })
       const token = localStorage.getItem("@KHUB_TOKEN")
       await app.post("/users/techs", data, {
         headers: { Authorization: `Bearer ${token}` }
@@ -112,9 +121,11 @@ export const useAPIStore = create<APIStore>((set) => ({
         onTechListSuccess: true,
         techList: [...state.techList, data]
       }))
+      toastSuccess("Tecnologia adicionada com sucesso!")
     } catch (error) {
-      set({ onFailure: true })
+      set({ onTechListSuccess: false })
       console.error("Error adding new tech", error)
+      toastError("Ops! Algo deu errado, tente novamente!")
     }
   },
   deleteTech: async (techId: string) => {
@@ -127,9 +138,11 @@ export const useAPIStore = create<APIStore>((set) => ({
         }
       })
       set({ onTechListSuccess: true })
+      toastSuccess("Tecnologia deletada com sucesso!")
 
     } catch (error) {
       set({ onTechListSuccess: false })
+      toastError("Erro ao deletar a tecnologia!")
       console.error("Error deleting tech", error)
     }
   },
@@ -158,4 +171,3 @@ export const useAPIStore = create<APIStore>((set) => ({
     }
   }
 }))
-

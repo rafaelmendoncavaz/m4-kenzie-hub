@@ -5,32 +5,35 @@ import { InputContainer } from "../../components/global/InputContainer";
 import { Form } from "../../components/global/Form";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/global/Button";
-import { toastError, toastSuccess, useAPIStore } from "../../context/context";
-import { type LoginData, type User } from "../../schema/schema";
+import { useAPIStore } from "../../context/context";
+import { type LoginData } from "../../schema/schema";
 import { useEffect } from "react";
 import { app } from "../../services/app";
 
 export function SignIn() {
   const navigate = useNavigate()
   const { register, handleSubmit } = useForm<LoginData>()
+  const { userLogin, setUser } = useAPIStore((store) => store)
 
   useEffect(() => {
     const loadUser = async () => {
       const token = localStorage.getItem("@KHUB_TOKEN")
 
-      if (token) {
-        try {
-          await app.get("/profile", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            }
-          })
-          navigate("/dashboard")
-        } catch (error) {
-          console.error("Error loading user", error)
-          localStorage.removeItem("@KHUB_TOKEN")
-          localStorage.removeItem("@KHUB_USER")
-        }
+      if (!token) {
+        return
+      }
+      try {
+        const { data } = await app.get("/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        })
+        setUser(data)
+        navigate("/dashboard")
+      } catch (error) {
+        console.error("Error loading user", error)
+        localStorage.removeItem("@KHUB_TOKEN")
+        localStorage.removeItem("@KHUB_USER")
       }
     }
     loadUser()
@@ -39,21 +42,13 @@ export function SignIn() {
 
   async function onSubmit(data: LoginData) {
 
-    const { userLogin } = useAPIStore.getState()
     await userLogin(data)
 
-    const { onSuccess, onFailure } = useAPIStore.getState()
+    const { onSuccess, user } = useAPIStore.getState()
     if (onSuccess) {
-      toastSuccess("Login efetuado com sucesso!")
-      const storedUser = localStorage.getItem("@KHUB_USER")
-      const isUser: User | null = storedUser ? JSON.parse(storedUser) as User : null
-      if (isUser) {
+      if (user) {
         navigate("/dashboard")
       }
-    }
-    if (onFailure) {
-      toastError("Falha ao fazer login. Verifique seu email e senha.")
-      navigate("/")
     }
   }
 

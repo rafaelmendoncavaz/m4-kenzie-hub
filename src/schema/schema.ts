@@ -87,9 +87,6 @@ export type User = {
   techs: Techs[],
 }
 
-const storedUser = localStorage.getItem("@KHUB_USER")
-export const user: User | null = storedUser ? JSON.parse(storedUser) as User : null
-
 export interface Modal {
   isAddTechModalOpen: boolean,
   isEditTechModalOpen: boolean,
@@ -102,6 +99,8 @@ export interface APIStore {
   onSuccess: boolean,
   onFailure: boolean,
   onTechListSuccess: boolean,
+  user: User | null,
+  setUser: (userData: User | null) => void,
   createUser: (data: createUser) => Promise<void>,
   userLogin: (data: LoginData) => Promise<void>,
   userLogout: (callback: () => void) => void,

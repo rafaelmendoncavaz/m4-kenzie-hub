@@ -33,7 +33,6 @@ export function SignUp() {
     }
     if (onFailure) {
       toastError("Ops! Algo deu errado. Tente novamente!")
-      reset()
     }
   }
 
