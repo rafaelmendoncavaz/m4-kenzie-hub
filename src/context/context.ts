@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { type APIStore, type createUser, type LoginData, type Modal, type TechData, type Techs, type ToastMessage, type User } from "../schema/schema"
+import { type APIStore, type createUser, type EditUser, type LoginData, type Modal, type TechData, type Techs, type ToastMessage, type User, type Works } from "../schema/schema"
 import { app } from "../services/app"
 import { Bounce, toast } from "react-toastify"
 
@@ -36,15 +36,30 @@ export const toastError: ToastMessage = (message) => {
 export const useModal = create<Modal>((set) => ({
   isAddTechModalOpen: false,
   isEditTechModalOpen: false,
+  isEditUserModalOpen: false,
+  isAddWorkModalOpen: false,
+  isEditWorkModalOpen: false,
   openAddTechModal: () => {
     set({ isAddTechModalOpen: true })
   },
   openEditTechModal: () => {
     set({ isEditTechModalOpen: true })
   },
+  openEditUserModal: () => {
+    set({ isEditUserModalOpen: true })
+  },
+  openAddWorkModal: () => {
+    set({ isAddWorkModalOpen: true })
+  },
+  openEditWorkModal: () => {
+    set({ isEditWorkModalOpen: true })
+  },
   closeModal: () => {
     set({ isAddTechModalOpen: false })
     set({ isEditTechModalOpen: false })
+    set({ isEditUserModalOpen: false })
+    set({ isAddWorkModalOpen: false })
+    set({ isEditWorkModalOpen: false })
   }
 }))
 
@@ -52,6 +67,7 @@ export const useAPIStore = create<APIStore>((set) => ({
   onSuccess: false,
   onFailure: false,
   onTechListSuccess: true,
+  onWorkListSuccess: true,
   user: null,
   setUser: (userData: User | null) => {
     set({ user: userData })
@@ -92,6 +108,28 @@ export const useAPIStore = create<APIStore>((set) => ({
     set({ user: null })
     if (callback) callback()
     toastSuccess("Logout de KenzieHub efetuado com sucesso!")
+  },
+  editUser: async (userData: EditUser) => {
+    try {
+      set({ onSuccess: false, onFailure: false })
+      const token = localStorage.getItem("@KHUB_TOKEN")
+      await app.put("/profile", userData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
+      const { data } = await app.get("/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
+      set({ onSuccess: true, user: data })
+      toastSuccess("Perfil atualizado com sucesso!")
+    } catch (error) {
+      console.error("Error editing user", error)
+      set({ onFailure: true })
+      toastError("Falha ao atualizar o seu perfil. Tente novamente!")
+    }
   },
   techList: [],
   getTechs: async () => {
@@ -169,5 +207,80 @@ export const useAPIStore = create<APIStore>((set) => ({
       set({ onTechListSuccess: false })
       console.error("Error editing tech", error)
     }
-  }
+  },
+  workList: [],
+  getWorks: async () => {
+    try {
+      set({ onSuccess: false, onFailure: false })
+      const token = localStorage.getItem("@KHUB_TOKEN")
+      const { data } = await app.get("/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
+      set({ workList: data.works })
+
+    } catch (error) {
+      set({ onFailure: true })
+      console.error("Error getting techs", error)
+    }
+  },
+  addNewWork: async (data: Works) => {
+    try {
+      set({ onWorkListSuccess: false })
+      const token = localStorage.getItem("@KHUB_TOKEN")
+      await app.post("/users/works", data, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      set((state) => ({
+        onWorkListSuccess: true,
+        workList: [...state.workList, data]
+      }))
+      toastSuccess("Trabalho adicionado com sucesso!")
+    } catch (error) {
+      set({ onWorkListSuccess: false })
+      console.error("Error adding new work", error)
+      toastError("Ops! Algo deu errado, tente novamente!")
+    }
+  },
+  deleteWork: async (workId: Works["id"]) => {
+    try {
+      set({ onWorkListSuccess: false })
+      const token = localStorage.getItem("@KHUB_TOKEN")
+      await app.delete(`/users/works/${workId}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      set({ onWorkListSuccess: true })
+      toastSuccess("Trabalho deletado com sucesso!")
+
+    } catch (error) {
+      set({ onWorkListSuccess: false })
+      toastError("Erro ao deletar o Trabalho!")
+      console.error("Error deleting work", error)
+    }
+  },
+  workToEdit: null,
+  setWorkToEdit: (work: Works) => {
+    set({ workToEdit: work })
+  },
+  editWork: async (workId: Works["id"] | undefined, work: Works) => {
+    try {
+      set({ onWorkListSuccess: false })
+      const token = localStorage.getItem("@KHUB_TOKEN")
+
+      await app.put(`/users/works/${workId}`, work,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+      set({ onWorkListSuccess: true })
+
+    } catch (error) {
+      set({ onWorkListSuccess: false })
+      console.error("Error editing work", error)
+    }
+  },
 }))

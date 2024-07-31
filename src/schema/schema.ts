@@ -77,6 +77,13 @@ export type Techs = {
   status: string,
 }
 
+export type Works = {
+  id?: string | undefined,
+  title: string,
+  description: string,
+  deploy_url: string,
+}
+
 export type User = {
   name: string,
   email: string,
@@ -87,11 +94,24 @@ export type User = {
   techs: Techs[],
 }
 
+export type EditUser = {
+  name: string,
+  contact: string,
+  old_password: string,
+  password: string
+}
+
 export interface Modal {
   isAddTechModalOpen: boolean,
   isEditTechModalOpen: boolean,
+  isEditUserModalOpen: boolean,
+  isAddWorkModalOpen: boolean,
+  isEditWorkModalOpen: boolean,
   openAddTechModal: () => void,
   openEditTechModal: () => void,
+  openEditUserModal: () => void,
+  openAddWorkModal: () => void,
+  openEditWorkModal: () => void,
   closeModal: () => void
 }
 
@@ -99,9 +119,11 @@ export interface APIStore {
   onSuccess: boolean,
   onFailure: boolean,
   onTechListSuccess: boolean,
+  onWorkListSuccess: boolean,
   user: User | null,
   setUser: (userData: User | null) => void,
   createUser: (data: createUser) => Promise<void>,
+  editUser: (userData: EditUser) => Promise<void>,
   userLogin: (data: LoginData) => Promise<void>,
   userLogout: (callback: () => void) => void,
   addNewTech: (data: Techs) => Promise<void>,
@@ -111,4 +133,11 @@ export interface APIStore {
   techToEdit: Techs | null,
   setTechToEdit: (techs: Techs) => void,
   editTech: (techId: Techs["id"] | undefined, tech: TechData) => Promise<void>,
+  workList: Works[],
+  addNewWork: (data: Works) => Promise<void>,
+  getWorks: () => Promise<void>,
+  deleteWork: (workId: string | undefined) => Promise<void>,
+  workToEdit: Works | null,
+  setWorkToEdit: (works: Works) => void,
+  editWork: (workId: Works["id"] | undefined, work: Works) => Promise<void>,
 }

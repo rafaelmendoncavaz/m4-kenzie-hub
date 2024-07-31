@@ -1,0 +1,28 @@
+.customSwiperButton {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.swiperButtonNext.customSwiperButton {
+  right: 0px;
+}
+
+.swiperButtonPrev.customSwiperButton {
+  left: 0px;
+}
+
+.swiperPaginationBullet {
+  background: #fff;
+}
+
+.swiperPaginationBulletActive {
+  background: #000;
+}

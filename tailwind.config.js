@@ -23,8 +23,29 @@ export default {
         "mobile": {
           "max": "640px"
         }
-      }
+      },
+      scrollbarWidth: {
+        none: 'none',
+      },
+      scrollbar: {
+        hidden: 'hidden',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.scrollbar-hidden': {
+          'scrollbar-width': 'none',
+        },
+        '.scrollbar-none': {
+          'overflow': 'hidden',
+          '-ms-overflow-style': 'none',
+        },
+        '.scrollbar-hidden::-webkit-scrollbar': {
+          display: 'none',
+        },
+      }, ['responsive']);
+    },
+  ],
 }
